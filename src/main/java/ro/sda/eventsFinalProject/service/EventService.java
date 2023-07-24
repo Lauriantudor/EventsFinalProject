@@ -32,11 +32,6 @@ public class EventService {
         if (id == null) {
             throw new IllegalArgumentException("Events id must not be null!");
         }
-        // orElse (object the OtherValue)
-        // if (this.value != null
-        //     return this.value
-        // else
-        //     return theOtherValue
         Event event = eventRepository.findById(id).orElse(null);
         if (event == null) {
             throw new IllegalArgumentException("There it is no event with " + id);
