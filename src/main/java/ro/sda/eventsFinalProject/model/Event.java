@@ -1,5 +1,6 @@
 package ro.sda.eventsFinalProject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +27,9 @@ public class Event {
     private LocalDateTime endDate;
     private String description;
     private String location;
+    private String imgUrl;
+    @ManyToOne
+    private Category  category;
+
 
 }

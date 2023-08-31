@@ -1,7 +1,10 @@
 package ro.sda.eventsFinalProject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.*;
 
 @Entity
 @Data
@@ -15,4 +18,9 @@ public class Category {
     private Integer id;
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private List<Event> events =new ArrayList<>();
+
 }

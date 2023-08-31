@@ -2,7 +2,9 @@ package ro.sda.eventsFinalProject.service;
 
 import org.springframework.stereotype.Service;
 import ro.sda.eventsFinalProject.model.Category;
+import ro.sda.eventsFinalProject.model.Event;
 import ro.sda.eventsFinalProject.repository.CategoryRepository;
+import ro.sda.eventsFinalProject.repository.EventRepository;
 
 import java.util.List;
 
@@ -10,9 +12,14 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final EventRepository eventRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+
+    public CategoryService(CategoryRepository categoryRepository,
+                           EventRepository eventRepository) {
+         this.categoryRepository = categoryRepository;
+
+        this.eventRepository = eventRepository;
     }
     public Category saveCategory(Category categoryToBeSave){
         if (categoryToBeSave==null){
@@ -34,6 +41,14 @@ public class CategoryService {
         }
         return category;
     }
+    public List<Event> getEventsOfCategory(Integer categoryId){
+        Category category  = readCategory(categoryId);
+        if (category.getEvents().isEmpty()){
+            throw new IllegalArgumentException("The category has no events");
+        }
+        List<Event> eventsOf = category.getEvents();
+        return eventsOf;
+    }
     public List<Category> readAllCategories(){
         return categoryRepository.findAll();
     }
@@ -47,6 +62,15 @@ public class CategoryService {
     }
     public void deleteCategory(Integer categoryId){
         Category categoryToDelete = readCategory(categoryId);
+        List<Event> eventsOf = categoryToDelete.getEvents();
+        for (Event e : eventsOf){
+            e.setCategory(null);
+            eventRepository.save(e);
+        }
         categoryRepository.delete(categoryToDelete);
+
     }
+
+
+
 }

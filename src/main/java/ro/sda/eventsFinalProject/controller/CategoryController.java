@@ -4,11 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ro.sda.eventsFinalProject.model.Category;
+import ro.sda.eventsFinalProject.model.Event;
 import ro.sda.eventsFinalProject.service.CategoryService;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/category")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -17,7 +19,7 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @PostMapping("/categories")
+    @PostMapping
     public ResponseEntity createCategory(@RequestBody Category category) {
         if (category.getId() != null) {
             return new ResponseEntity("Id must be empty", HttpStatus.BAD_REQUEST);
@@ -29,8 +31,16 @@ public class CategoryController {
             return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-    @GetMapping("/categories/{id}")
+    @GetMapping("/eventsOf/{id}")
+   public ResponseEntity getEventsOf(@PathVariable Integer id){
+        try{
+            List<Event> getEventsOf = categoryService.getEventsOfCategory(id);
+            return new ResponseEntity(getEventsOf, HttpStatus.OK);
+        }catch(IllegalArgumentException ex){
+            return new ResponseEntity(ex.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+    @GetMapping("/{id}")
     public ResponseEntity readCategory(@PathVariable Integer id) {
         try {
             Category readCategory = categoryService.readCategory(id);
@@ -40,12 +50,12 @@ public class CategoryController {
         }
     }
 
-    @GetMapping("/categories")
+    @GetMapping
     public ResponseEntity readAllCategories() {
         List<Category> allCategories = categoryService.readAllCategories();
         return new ResponseEntity(allCategories, HttpStatus.OK);
     }
-    @PutMapping("/categories/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity updateCategories(@PathVariable Integer id, @RequestBody Category updatedCategory) {
         if (!id.equals(updatedCategory.getId())) {
             return new ResponseEntity("Inconsistent ID", HttpStatus.BAD_REQUEST);
@@ -57,11 +67,11 @@ public class CategoryController {
             return new ResponseEntity(ex.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @DeleteMapping("/categories/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity delete(@PathVariable Integer id){
         try {
             categoryService.deleteCategory(id);
-            return new ResponseEntity("Category deleted sucesfuly",HttpStatus.OK);
+            return new ResponseEntity("Category deleted sucesfuly",HttpStatus.NO_CONTENT);
         }catch (IllegalArgumentException ex){
             return new ResponseEntity(ex.getMessage(),HttpStatus.BAD_REQUEST);
         }

@@ -3,6 +3,7 @@ package ro.sda.eventsFinalProject.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ro.sda.eventsFinalProject.model.Category;
 import ro.sda.eventsFinalProject.model.Event;
 import ro.sda.eventsFinalProject.service.EventService;
 
@@ -13,6 +14,7 @@ public class EventController {
     private final EventService eventService;
 
     public EventController(EventService eventService){
+
         this.eventService=eventService;
     }
     @PostMapping("/events")
@@ -55,12 +57,30 @@ public class EventController {
             return new ResponseEntity<>(iAE.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
+//    @PutMapping("events/addTo/{id}")
+//    public ResponseEntity addTo(@PathVariable Integer id, @RequestBody Category category){
+//        try{
+//            Event eventAssignTo = eventService.addToCategory(id, category);
+//            return  new ResponseEntity(eventAssignTo,HttpStatus.OK);
+//        }catch (IllegalArgumentException ex){
+//            return new ResponseEntity(ex.getMessage(),HttpStatus.BAD_REQUEST);
+//        }
+//    }
+//    @PutMapping("/events/removeFrom/{id}")
+//    public ResponseEntity removeFrom(@PathVariable Integer id, @RequestBody Category category){
+//        try{
+//            Event eventAssignTo = eventService.removeFromCategory(id, category);
+//            return  new ResponseEntity(eventAssignTo,HttpStatus.OK);
+//        }catch (IllegalArgumentException ex){
+//            return new ResponseEntity(ex.getMessage(),HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
     @DeleteMapping("/events/{id}")
     public ResponseEntity delete(@PathVariable Integer id){
         try {
             eventService.deleteEvent(id);
-            return new ResponseEntity("Event deleted sucesfuly ", HttpStatus.OK);
+            return new ResponseEntity("Event deleted sucesfuly ", HttpStatus.NO_CONTENT);
         }catch (IllegalArgumentException ex){
             return new ResponseEntity(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
