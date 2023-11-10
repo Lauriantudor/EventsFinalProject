@@ -10,6 +10,7 @@ import ro.sda.eventsFinalProject.service.EventService;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1/events")
 public class EventController {
     private final EventService eventService;
 
@@ -17,7 +18,7 @@ public class EventController {
 
         this.eventService=eventService;
     }
-    @PostMapping("/events")
+    @PostMapping
     public ResponseEntity createEvent(@RequestBody Event event){
        if (event.getId() != null){
            return new ResponseEntity("Id must be empty",HttpStatus.BAD_REQUEST);
@@ -29,7 +30,7 @@ public class EventController {
             return new ResponseEntity(ex.getMessage(),HttpStatus.BAD_REQUEST);
         }
     }
-    @GetMapping("/events/{id}")
+    @GetMapping("{id}")
     public ResponseEntity readEvent(@PathVariable(name = "id") Integer eventId) {
         try {
             Event readEvent = eventService.readEvent(eventId);
@@ -39,13 +40,13 @@ public class EventController {
         }
     }
 
-    @GetMapping("/events")
+    @GetMapping
     public ResponseEntity readAllEvents() {
         List<Event> allEvents = eventService.readAllEvents();
         return new ResponseEntity(allEvents, HttpStatus.OK);
     }
 
-    @PutMapping("/events/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity update(@PathVariable(name = "id") Integer pathId, @RequestBody Event updatedEvent) {
         if (!pathId.equals(updatedEvent.getId())) {
             return new ResponseEntity("Inconsistent ID", HttpStatus.BAD_REQUEST);
@@ -76,7 +77,7 @@ public class EventController {
 //        }
 //    }
 
-    @DeleteMapping("/events/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity delete(@PathVariable Integer id){
         try {
             eventService.deleteEvent(id);
