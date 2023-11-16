@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ro.sda.eventsFinalProject.model.TokenRepository;
 import ro.sda.eventsFinalProject.service.JwtService;
 
 import java.io.IOException;
@@ -19,9 +20,11 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService){
+    private final TokenRepository tokenRepository;
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, TokenRepository tokenRepository){
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.tokenRepository = tokenRepository;
     }
     @Override
     protected void doFilterInternal(
@@ -32,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String jwt;
             //username
             final String userEmail;
-            if (authHeader == null || authHeader.startsWith("Bearer ")){
+            if (authHeader == null || !authHeader.startsWith("Bearer ")){
                 filterChain.doFilter(request,response);
                 return;
             }
@@ -40,7 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             userEmail = jwtService.extractUserName(jwt);
             if (userEmail !=null && SecurityContextHolder.getContext().getAuthentication() ==null){
                 UserDetails userDetails =this.userDetailsService.loadUserByUsername(userEmail);
-                if (jwtService.isTokenValid(jwt,userDetails)){
+                var isTokenValid = tokenRepository.findByToken(jwt)
+                        .map(t->!t.isExpired() && !t.isRevoked())
+                        .orElse(false);
+                if (jwtService.isTokenValid(jwt,userDetails) && isTokenValid){
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
